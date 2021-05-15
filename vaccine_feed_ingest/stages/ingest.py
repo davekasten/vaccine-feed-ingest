@@ -5,6 +5,7 @@ import pathlib
 import subprocess
 import tempfile
 from subprocess import CalledProcessError
+from typing import Collection, Optional
 
 import pydantic
 from vaccine_feed_ingest_schema import location
@@ -302,6 +303,8 @@ def run_enrich(
     site_dir: pathlib.Path,
     output_dir: pathlib.Path,
     timestamp: str,
+    enrich_apis: Optional[Collection[str]],
+    placekey_apikey: Optional[str] = None,
     dry_run: bool = False,
 ) -> bool:
     normalize_run_dir = outputs.find_latest_run_dir(
@@ -347,7 +350,11 @@ def run_enrich(
             output_dir, site_dir, PipelineStage.ENRICH
         ) as api_cache:
             success = enrichment.enrich_locations(
-                enrich_input_dir, enrich_output_dir, api_cache
+                enrich_input_dir,
+                enrich_output_dir,
+                api_cache=api_cache,
+                enrich_apis=enrich_apis,
+                placekey_apikey=placekey_apikey,
             )
 
         if not success:
